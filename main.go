@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,11 +9,15 @@ import (
 )
 
 func main() {
-	repoRoot, err := vcs.RepoRootForImportPath(os.Args[1], true)
+	log.SetFlags(0)
+
+	if len(os.Args) <= 1 || len(os.Args) > 2 {
+		log.Fatal("usage: grab REPO_URL")
+	}
+	repoRoot, err := vcs.RepoRootForImportPath(os.Args[1], false)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%#v\n", repoRoot)
 	home := os.Getenv("GRAB_HOME")
 	if home == "" {
 		home, err = os.UserHomeDir()
@@ -23,9 +26,8 @@ func main() {
 		}
 	}
 	root := filepath.Join(home, "src", repoRoot.Root)
-	fmt.Printf("root: %#v\n", root)
 	err = repoRoot.VCS.Create(root, repoRoot.Repo)
 	if err != nil {
-		log.Fatalf("unable to download %#v into %#v: %#v", repoRoot.Repo, root, err)
+		log.Fatalf("unable to download %#v into %#v", repoRoot.Repo, root)
 	}
 }
