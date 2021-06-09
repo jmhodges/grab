@@ -1,3 +1,6 @@
+// Copyright 2021 Jeffrey M Hodges.
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
