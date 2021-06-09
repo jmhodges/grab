@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/tools/go/vcs"
 )
@@ -18,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	home := os.Getenv("GRAB_HOME")
+	home := strings.TrimSpace(os.Getenv("GRAB_HOME"))
 	if home == "" {
 		home, err = os.UserHomeDir()
 		if err != nil {
