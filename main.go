@@ -21,12 +21,13 @@ func main() {
 	}
 	home := strings.TrimSpace(os.Getenv("GRAB_HOME"))
 	if home == "" {
-		home, err = os.UserHomeDir()
+		userHome, err := os.UserHomeDir()
 		if err != nil {
 			log.Fatalf("unable to get current user's home directory: %s", err)
 		}
+		home = filepath.Join(userHome, "src")
 	}
-	root := filepath.Join(home, "src", repoRoot.Root)
+	root := filepath.Join(home, repoRoot.Root)
 	err = repoRoot.VCS.Create(root, repoRoot.Repo)
 	if err != nil {
 		log.Fatalf("unable to download %#v into %#v", repoRoot.Repo, root)
