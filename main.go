@@ -5,6 +5,7 @@ package main
 
 import (
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,9 +19,21 @@ func main() {
 	if len(os.Args) <= 1 || len(os.Args) > 2 {
 		log.Fatal("usage: grab REPO_URL")
 	}
-	repoRoot, err := vcs.RepoRootForImportPath(os.Args[1], false)
+	importPath := os.Args[1]
+
+	// We parse as a URL to see if we need to strip out the leading scheme for
+	// the vcs library. The vcs library works on "import paths" a la Go, not URLs.
+	u, err := url.Parse(os.Args[1])
+	// If we can't parse it as a URL, it might still mean the vcs library knows
+	// how to handle it.
+	if err == nil {
+		u.Scheme = ""
+		importPath = strings.TrimLeft(u.String(), "/")
+	}
+
+	repoRoot, err := vcs.RepoRootForImportPath(importPath, false)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("unable to figure out the repo root from the given url: %s", err)
 	}
 	home := strings.TrimSpace(os.Getenv("GRAB_HOME"))
 	if home == "" {
