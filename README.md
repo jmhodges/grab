@@ -1,4 +1,4 @@
-grab
+Grab
 ====
 
 Grab is a tool that downloads source code repositories into a convenient
@@ -20,3 +20,10 @@ created as subdirectories down the path.
 
 Also, the input to `grab` doesn't have to contain a scheme (e.g. `https://`) to
 work.
+
+Install
+-------
+
+Grab can be installed by downloading a binary from the [latest
+releases](https://github.com/jmhodges/grab/releases/), unpacking the file, and
+copying it into your `PATH`.
