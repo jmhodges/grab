@@ -24,6 +24,4 @@ work.
 Install
 -------
 
-Grab can be installed by downloading a binary from the [latest
-releases](https://github.com/jmhodges/grab/releases/), unpacking the file, and
-copying it into your `PATH`.
+Grab can be installed by running `go get github.com/jmhodges/grab`.
