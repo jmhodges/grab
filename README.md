@@ -24,4 +24,4 @@ work.
 Install
 -------
 
-Grab can be installed by running `go get github.com/jmhodges/grab`.
+Grab can be installed by running `go install github.com/jmhodges/grab`.
