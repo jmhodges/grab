@@ -1,0 +1,34 @@
+name: MacOS build
+on:
+  push:
+    branches:
+      - main
+      - "test_*"
+      - "test-*"
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Read Go versions
+        run: echo "##[set-output name=go_version;]$(cat .github/versions/go)"
+        id: go_versions
+
+      - name: Set up Go
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: ${{ steps.go_versions.outputs.go_version }}
+        id: go
+
+      - name: Install test dependencies
+        run: |
+          go test -i -race .
+      - name: Run tests
+        run: |
+          go test -race .
