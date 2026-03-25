@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Read Go versions
         run: echo "##[set-output name=go_version;]$(cat .github/versions/go)"
