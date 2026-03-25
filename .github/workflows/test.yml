@@ -21,7 +21,7 @@ jobs:
         id: go_versions
 
       - name: Set up Go
-        uses: actions/setup-go@v2.1.3
+        uses: actions/setup-go@v6.3.0
         with:
           go-version: ${{ steps.go_versions.outputs.go_version }}
         id: go
