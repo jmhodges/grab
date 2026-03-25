@@ -14,7 +14,8 @@ import (
 )
 
 type config struct {
-	Home string `toml:"home"`
+	Home              string   `toml:"home"`
+	SSHPreferredHosts []string `toml:"ssh_preferred_hosts"`
 }
 
 func loadConfig() (config, error) {

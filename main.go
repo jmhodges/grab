@@ -41,9 +41,14 @@ func main() {
 		log.Fatalf("unable to figure out the repo root from the given url: %s", err)
 	}
 
+	repo := repoRoot.Repo
+	if repoRoot.VCS.Cmd == "git" {
+		repo = rewriteToSSH(repo, cfg.SSHPreferredHosts)
+	}
+
 	root := filepath.Join(cfg.Home, repoRoot.Root)
-	err = repoRoot.VCS.Create(root, repoRoot.Repo)
+	err = repoRoot.VCS.Create(root, repo)
 	if err != nil {
-		log.Fatalf("unable to download %#v into %#v", repoRoot.Repo, root)
+		log.Fatalf("unable to download %#v into %#v", repo, root)
 	}
 }

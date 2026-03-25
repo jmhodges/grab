@@ -18,6 +18,9 @@ func TestLoadConfig(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if len(cfg.SSHPreferredHosts) != 0 {
+			t.Errorf("expected no ssh hosts, got %v", cfg.SSHPreferredHosts)
+		}
 		// Home should default to ~/src.
 		homeDir, _ := os.UserHomeDir()
 		want := filepath.Join(homeDir, "src")
@@ -30,7 +33,7 @@ func TestLoadConfig(t *testing.T) {
 		dir := t.TempDir()
 		grabDir := filepath.Join(dir, "grab")
 		os.MkdirAll(grabDir, 0755)
-		os.WriteFile(filepath.Join(grabDir, "config.toml"), []byte("home = \"/tmp/src\"\n"), 0644)
+		os.WriteFile(filepath.Join(grabDir, "config.toml"), []byte("home = \"/tmp/src\"\nssh_preferred_hosts = [\"github.com\"]\n"), 0644)
 		t.Setenv("GRAB_HOME", "")
 
 		cfg, err := loadConfigFrom(dir)
@@ -40,13 +43,16 @@ func TestLoadConfig(t *testing.T) {
 		if cfg.Home != "/tmp/src" {
 			t.Errorf("Home = %q, want /tmp/src", cfg.Home)
 		}
+		if len(cfg.SSHPreferredHosts) != 1 || cfg.SSHPreferredHosts[0] != "github.com" {
+			t.Errorf("SSHHosts = %v, want [github.com]", cfg.SSHPreferredHosts)
+		}
 	})
 
-	t.Run("env vars override config file", func(t *testing.T) {
+	t.Run("env var overrides home", func(t *testing.T) {
 		dir := t.TempDir()
 		grabDir := filepath.Join(dir, "grab")
 		os.MkdirAll(grabDir, 0755)
-		os.WriteFile(filepath.Join(grabDir, "config.toml"), []byte("home = \"/tmp/src\"\n"), 0644)
+		os.WriteFile(filepath.Join(grabDir, "config.toml"), []byte("home = \"/tmp/src\"\nssh_preferred_hosts = [\"github.com\"]\n"), 0644)
 		t.Setenv("GRAB_HOME", "/override/src")
 
 		cfg, err := loadConfigFrom(dir)
@@ -55,6 +61,9 @@ func TestLoadConfig(t *testing.T) {
 		}
 		if cfg.Home != "/override/src" {
 			t.Errorf("Home = %q, want /override/src", cfg.Home)
+		}
+		if len(cfg.SSHPreferredHosts) != 1 || cfg.SSHPreferredHosts[0] != "github.com" {
+			t.Errorf("SSHHosts = %v, want [github.com]", cfg.SSHPreferredHosts)
 		}
 	})
 
