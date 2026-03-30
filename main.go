@@ -29,6 +29,7 @@ func main() {
 	if err == nil {
 		u.Scheme = ""
 		importPath = strings.TrimLeft(u.String(), "/")
+		importPath = strings.TrimRight(importPath, "/")
 	}
 
 	repoRoot, err := vcs.RepoRootForImportPath(importPath, false)
