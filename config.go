@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -17,6 +18,21 @@ type config struct {
 }
 
 func loadConfig() (config, error) {
+	// On macOS, check $HOME/.config/grab/config.toml first before falling
+	// back to the native Library/Application Support directory.
+	if runtime.GOOS == "darwin" {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return config{}, err
+		}
+		// Duplicating the appending of grab to the config dir because this is
+		// the only platform we have a fallback on.
+		xdgConfig := filepath.Join(homeDir, ".config", "grab", "config.toml")
+		if _, err := os.Stat(xdgConfig); err == nil {
+			return loadConfigFrom(filepath.Join(homeDir, ".config"))
+		}
+	}
+
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return config{}, err
