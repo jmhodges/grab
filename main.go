@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	mvcs "github.com/Masterminds/vcs"
 )
@@ -31,12 +32,24 @@ func main() {
 		log.Fatalf("unable to load config: %s", err)
 	}
 
+	// Strip the scheme to get the import path for go-import resolution.
+	importPath := strings.TrimPrefix(strings.TrimPrefix(rawURL, "https://"), "http://")
+
+	// Try direct repo root derivation first. If that fails (e.g. vanity
+	// import like go.uber.org/zap), fall back to go-import meta tag
+	// resolution.
 	root, err := repoRoot(rawURL)
+	remoteURL := rawURL
 	if err != nil {
-		log.Fatalf("unable to determine repo root from %q: %s", rawURL, err)
+		gi, giErr := resolveGoImport(importPath)
+		if giErr != nil {
+			log.Fatalf("unable to determine repo from %q: %s", rawURL, giErr)
+		}
+		root = gi.Root
+		remoteURL = gi.RepoURL
 	}
 
-	remoteURL := rewriteToSSH(rawURL, cfg.SSHPreferredHosts)
+	remoteURL = rewriteToSSH(remoteURL, cfg.SSHPreferredHosts)
 
 	localPath := filepath.Join(cfg.Home, root)
 	repo, err := mvcs.NewRepo(remoteURL, localPath)
