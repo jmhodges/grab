@@ -26,9 +26,6 @@ jobs:
           go-version: ${{ steps.go_versions.outputs.go_version }}
         id: go
 
-      - name: Install test dependencies
-        run: |
-          go test -i -race .
       - name: Run tests
         run: |
           go test -race .
