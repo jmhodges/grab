@@ -33,9 +33,10 @@ Grab can be configured with the `GRAB_HOME` environment variable and further
 configurations (including that setting) can be set with a TOML config file at
 `grab/config.toml` inside your platforms configuration directory.
 
-(On Windows, that's in `%AppData%`. On MacOS, that's `$HOME/Library/Application
-Support`. And Linux and BSD, that's `$XDG_CONFIG_HOME` or `$HOME/.config/` if
-that's not set.)
+(On Windows, that's in `%AppData%`. On macOS, that's `$HOME/.config/` or
+`$HOME/Library/Application Support/grab` if `.config/grab/config.toml` doesn't exist.
+On Linux and BSD, that's `$XDG_CONFIG_HOME` or `$HOME/.config/` if that's not
+set.)
 
 The config settings in `config.toml` and `config.toml` itself are all optional.
 
