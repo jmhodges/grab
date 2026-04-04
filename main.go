@@ -8,9 +8,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"golang.org/x/tools/go/vcs"
+	mvcs "github.com/Masterminds/vcs"
 )
 
 func main() {
@@ -19,16 +18,12 @@ func main() {
 	if len(os.Args) <= 1 || len(os.Args) > 2 {
 		log.Fatal("usage: grab REPO_URL")
 	}
-	importPath := os.Args[1]
+	rawURL := os.Args[1]
 
-	// We parse as a URL to see if we need to strip out the leading scheme for
-	// the vcs library. The vcs library works on "import paths" a la Go, not URLs.
-	u, err := url.Parse(os.Args[1])
-	// If we can't parse it as a URL, it might still mean the vcs library knows
-	// how to handle it.
-	if err == nil {
-		u.Scheme = ""
-		importPath = strings.TrimLeft(u.String(), "/")
+	// Ensure the input has a scheme so we can parse it as a URL.
+	u, err := url.Parse(rawURL)
+	if err == nil && u.Scheme == "" {
+		rawURL = "https://" + rawURL
 	}
 
 	cfg, err := loadConfig()
@@ -36,19 +31,20 @@ func main() {
 		log.Fatalf("unable to load config: %s", err)
 	}
 
-	repoRoot, err := vcs.RepoRootForImportPath(importPath, false)
+	root, err := repoRoot(rawURL)
 	if err != nil {
-		log.Fatalf("unable to figure out the repo root from the given url: %s", err)
+		log.Fatalf("unable to determine repo root from %q: %s", rawURL, err)
 	}
 
-	repo := repoRoot.Repo
-	if repoRoot.VCS.Cmd == "git" {
-		repo = rewriteToSSH(repo, cfg.SSHPreferredHosts)
-	}
+	remoteURL := rewriteToSSH(rawURL, cfg.SSHPreferredHosts)
 
-	root := filepath.Join(cfg.Home, repoRoot.Root)
-	err = repoRoot.VCS.Create(root, repo)
+	localPath := filepath.Join(cfg.Home, root)
+	repo, err := mvcs.NewRepo(remoteURL, localPath)
 	if err != nil {
-		log.Fatalf("unable to download %#v into %#v", repo, root)
+		log.Fatalf("unable to determine VCS type for %q: %s", remoteURL, err)
+	}
+	err = repo.Get()
+	if err != nil {
+		log.Fatalf("unable to download %#v into %#v: %s", remoteURL, localPath, err)
 	}
 }

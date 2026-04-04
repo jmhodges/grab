@@ -4,7 +4,5 @@ go 1.26.1
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	golang.org/x/tools/go/vcs v0.1.0-deprecated
+	github.com/Masterminds/vcs v1.13.3
 )
-
-require golang.org/x/sys v0.10.0 // indirect
