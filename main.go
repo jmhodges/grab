@@ -31,19 +31,17 @@ func main() {
 		importPath = strings.TrimLeft(u.String(), "/")
 	}
 
+	cfg, err := loadConfig()
+	if err != nil {
+		log.Fatalf("unable to load config: %s", err)
+	}
+
 	repoRoot, err := vcs.RepoRootForImportPath(importPath, false)
 	if err != nil {
 		log.Fatalf("unable to figure out the repo root from the given url: %s", err)
 	}
-	home := strings.TrimSpace(os.Getenv("GRAB_HOME"))
-	if home == "" {
-		userHome, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatalf("unable to get current user's home directory: %s", err)
-		}
-		home = filepath.Join(userHome, "src")
-	}
-	root := filepath.Join(home, repoRoot.Root)
+
+	root := filepath.Join(cfg.Home, repoRoot.Root)
 	err = repoRoot.VCS.Create(root, repoRoot.Repo)
 	if err != nil {
 		log.Fatalf("unable to download %#v into %#v", repoRoot.Repo, root)
