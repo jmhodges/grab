@@ -38,14 +38,17 @@ configurations (including that setting) can be set with a TOML config file at
 On Linux and BSD, that's `$XDG_CONFIG_HOME` or `$HOME/.config/` if that's not
 set.)
 
-The config settings in `config.toml` and `config.toml` itself are all optional.
+The config settings in `config.toml` and the existenc of `config.toml` itself
+are optional.
 
 ```toml
 home = "/home/user/src" # prefer the env var GRAB_HOME if shell-variables are needed
+ssh_preferred_hosts = ["github.com", "gitlab.com"]
 ```
 
 - **`home`**: The directory to download repos into. Equivalent to `GRAB_HOME`.
+- **`ssh_preferred_hosts`**: A list of hosts for which git clone URLs should be rewritten
+  from HTTPS to SSH (e.g. `git@github.com:user/repo.git`).
 
-Environment variables override config file values:
-
-- `GRAB_HOME` overrides `home`.
+The environment variable `GRAB_HOME` overrides `home` and `GRAB_HOME` is
+preferred if you need shell variables in it (like `~` or `$HOME`).
