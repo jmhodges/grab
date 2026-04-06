@@ -25,8 +25,14 @@ type goImport struct {
 // resolveGoImport fetches https://<importPath>?go-get=1 and parses the
 // <meta name="go-import"> tag to discover the VCS type and repository URL.
 func resolveGoImport(importPath string) (goImport, error) {
-	u := "https://" + importPath + "?go-get=1"
-	resp, err := http.Get(u)
+	return resolveGoImportFrom(http.DefaultClient, "https://"+importPath, importPath)
+}
+
+// resolveGoImportFrom fetches fetchURL?go-get=1 using the given client and
+// parses the <meta name="go-import"> tag whose root matches importPath.
+func resolveGoImportFrom(client *http.Client, fetchURL, importPath string) (goImport, error) {
+	u := fetchURL + "?go-get=1"
+	resp, err := client.Get(u)
 	if err != nil {
 		return goImport{}, fmt.Errorf("fetching %s: %w", u, err)
 	}
